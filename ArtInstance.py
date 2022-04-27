@@ -35,8 +35,9 @@ class Art:
     def check_folder_exists(self, out_folder):
         if not os.path.exists(out_folder):
             os.makedirs(out_folder)
-    
+
     # convert already made dict into a nested default dict
+    # https://stackoverflow.com/questions/50013768/how-can-i-convert-nested-dictionary-to-defaultdict
     def defaultify(self, d):
         if not isinstance(d, dict):
             return d
@@ -46,10 +47,11 @@ class Art:
         self.check_folder_exists('./data/')
         with open('./data/fan_art_data.json', 'a+') as json_file:
             try:
-                # load the existing data into a dict
+                # load the existing data into a dict and conver tot defaultdict
                 file_data = json.load(json_file)
                 file_data = self.defaultify(file_data)
-                # update file with the api data
+
+                # update json with the api data
                 for author_id, tweets in self.data.items():
                     for tweet_ids in tweets.values():
                         for tweet_id, values in tweet_ids.items():
@@ -57,11 +59,14 @@ class Art:
 
                 # moves file pointer to the beginning
                 json_file.seek(0)
+
+            # loading an empty json will prod err
             except json.decoder.JSONDecodeError as err:
                 print(f'Json is empty: {err}')
                 print(f'Creating new json file')
                 # convert to json
                 json.dump(self.data, json_file, indent=4)
+
             else:
                 # convert to json
                 json.dump(file_data, json_file, indent=4)
@@ -70,18 +75,19 @@ class Art:
                 print('Json saved')
                 json_file.close()
 
-    def save_imgs_by_user(self, imgs_info, id):
-
+    # save images in a tweet
+    def save_imgs_by_user(self, imgs_info, author_id):
         for key, img in imgs_info.items():
 
-            with open(f'./images/{id}/{key}.jpg', 'wb') as handler:
+            with open(f'./images/{author_id}/{key}.jpg', 'wb') as handler:
                 handler.write(img)
                 handler.close()
             print(f'Img: {key} saved')
 
+    # save all user images
     def save_all_users_media(self):
         # loop through tweet data
-        for id, tweets in self.data.items():
+        for author_id, tweets in self.data.items():
             for tweet in tweets['tweet_id'].values():
                 try:
                     # convert urls to content
@@ -93,13 +99,14 @@ class Art:
                 except requests.exceptions.MissingSchema as e:
                     print(
                         f"media key:{tweet['media_keys']}, {tweet['tweet_url']} is a video: {e}")
+                    # continue to next tweet
                     continue
 
                 else:
                     imgs_info = dict(zip(tweet['media_keys'], imgs_data))
 
                     # create folder
-                    self.check_folder_exists(f'./images/{id}')
+                    self.check_folder_exists(f'./images/{author_id}')
 
-                    # saving image
-                    self.save_imgs_by_user(imgs_info, id)
+                    # saving images by author
+                    self.save_imgs_by_user(imgs_info, author_id)
