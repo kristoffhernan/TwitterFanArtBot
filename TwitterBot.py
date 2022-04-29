@@ -1,6 +1,9 @@
 import tweepy
 import config
 from ArtInstance import Art
+import SendEmail
+import os
+from datetime import date, timedelta
 
 
 def auth_client():
@@ -75,6 +78,25 @@ def main():
     tweets = search_tweets()
     query_tweets(tweets, client, trash_taste_art)
     save_tweet_media(trash_taste_art)
+
+    # directory variables
+    cwd = os.getcwd()
+    data_folder = os.path.join(cwd, 'data')
+    zip_folder = os.path.join(cwd, 'zip')
+
+    # compress data dir as zip file
+    today = date.today()
+    last_week = date.today() - timedelta(days=7)
+    zip_filename = f'TT-Data-{last_week}-{today}.zip'
+
+    SendEmail.zip_dir(data_folder, zip_folder, zip_filename)
+
+    SendEmail.remove_folder_contents(data_folder)
+
+    SendEmail.send_email(zip_folder, zip_filename,
+                         config.EMAIL_ADDRESS, config.GMAIL_APP_PASS)
+
+    SendEmail.remove_folder_contents(zip_folder)
 
 
 if __name__ == '__main__':
