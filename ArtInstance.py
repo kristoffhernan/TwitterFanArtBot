@@ -3,6 +3,10 @@ from collections import defaultdict
 import json
 import os
 
+'''
+Class to perform actions on the data (adding, removing, saving)
+'''
+
 
 class Art:
     def __init__(self):
@@ -44,8 +48,12 @@ class Art:
         return defaultdict(lambda: defaultdict(dict), {k: self.defaultify(v) for k, v in d.items()})
 
     def save_to_json(self):
-        self.check_folder_exists('./data/json')
-        with open('./data/json/fan_art_data.json', 'a+') as json_file:
+        json_folder_aws = '../../tmp/data/json'
+        json_folder_wind = './tmp/data/json'
+        json_filename = 'fan_art_data.json'
+
+        self.check_folder_exists(json_folder_aws)
+        with open(os.path.join(json_folder_aws, json_filename), 'a+') as json_file:
             try:
                 # load the existing data into a dict and conver tot defaultdict
                 file_data = json.load(json_file)
@@ -77,9 +85,12 @@ class Art:
 
     # save images in a tweet
     def save_imgs_by_user(self, imgs_info, author_id):
-        for key, img in imgs_info.items():
+        author_folder_aws = f'../../tmp/data/images/{author_id}'
+        author_folder_wind = f'./tmp/data/images/{author_id}'
 
-            with open(f'./data/images/{author_id}/{key}.jpg', 'wb') as handler:
+        for key, img in imgs_info.items():
+            key_filename = f'{key}.jpg'
+            with open(os.path.join(author_folder_aws, key_filename), 'wb') as handler:
                 handler.write(img)
                 handler.close()
             print(f'Img: {key} saved')
@@ -106,7 +117,9 @@ class Art:
                     imgs_info = dict(zip(tweet['media_keys'], imgs_data))
 
                     # create folder
-                    self.check_folder_exists(f'./data/images/{author_id}')
+                    author_folder_aws = f'../../tmp/data/images/{author_id}'
+                    author_folder_wind = f'./tmp/data/images/{author_id}'
+                    self.check_folder_exists(author_folder_aws)
 
                     # saving images by author
                     self.save_imgs_by_user(imgs_info, author_id)

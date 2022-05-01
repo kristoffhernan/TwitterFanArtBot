@@ -8,11 +8,24 @@ from datetime import date, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
-import config
+# import config
+
+
+'''
+SendEmail performs the clean up and update by removing images 
+and relaying the images through email
+'''
+
+# checks if a folder exists, if not it makes one
+
+
+def check_folder_exists(out_folder):
+    if not os.path.exists(out_folder):
+        os.makedirs(out_folder)
 
 
 # https://stackoverflow.com/questions/26124281/convert-a-str-to-path-type
-# dir = directory to zip | filename = zip file name
+# turns folders into a zip file
 def zip_dir(dir, zip_path, zip_filname):
     """Zip the provided directory without navigating to that directory using `pathlib` module"""
     filename = os.path.join(zip_path, zip_filname)
@@ -65,12 +78,13 @@ def remove_folder_contents(content_folder):
 
 # https://docs.python.org/3/library/email.examples.html
 # https://djangocentral.com/sending-email-with-zip-files-using-python/
-def send_email(zip_folder, zip_filename, EMAIL_ADDRESS, EMAIL_PASSWORD):
+def send_email(zip_folder, zip_filename, EMAIL_ADDRESS, EMAIL_PASSWORD, CC_EMAIL_ADDRESS):
     msg = MIMEMultipart()
     body = MIMEText('Weekly Update', 'plain')
     msg['Subject'] = 'TrashTaste Twitter Bot'
     msg['From'] = EMAIL_ADDRESS
     msg['To'] = EMAIL_ADDRESS
+    msg['Cc'] = CC_EMAIL_ADDRESS
 
     # Add body to email
     msg.attach(body)
@@ -91,11 +105,13 @@ def send_email(zip_folder, zip_filename, EMAIL_ADDRESS, EMAIL_PASSWORD):
         print('Email sent.')
 
 
+# test function to send email on windows
 def send_email_test():
-    EMAIL_ADDRESS = config.EMAIL_ADDRESS
+    # EMAIL_ADDRESS = config.EMAIL_ADDRESS
     # https://support.google.com/accounts/answer/185833?hl=en
     # cant just use real password, have to use gmail app passwords
-    EMAIL_PASSWORD = config.GMAIL_APP_PASS
+    # EMAIL_PASSWORD = config.GMAIL_APP_PASS
+    # CC_EMAIL_ADDRESS = config.CC_EMAIL_ADDRESS
 
     # directory variables
     cwd = os.getcwd()
@@ -110,7 +126,8 @@ def send_email_test():
 
     # remove_folder_contents(data_folder)
 
-    send_email(zip_folder, zip_filename, EMAIL_ADDRESS, EMAIL_PASSWORD)
+    # send_email(zip_folder, zip_filename, EMAIL_ADDRESS,
+    #            EMAIL_PASSWORD, CC_EMAIL_ADDRESS)
 
     # remove_folder_contents(zip_folder)
 
