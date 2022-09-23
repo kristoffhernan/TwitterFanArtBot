@@ -1,4 +1,4 @@
-#### [Website](https://friendly-borg-18530c.netlify.app/survey.html)
+#### [Website](https://twitter.com/TTArtBot)
 
 #### Description: 
 [Trash Taste](https://www.youtube.com/c/TrashTaste/videos) is a highly anticipated anime podcast exploring anime, manga, and otaku culture with top anime YouTubers Joey from the The Anime Man, Garnt from Gigguk, and Connor from Cdawgva and occasionally special guests.
